@@ -1,0 +1,766 @@
+[
+  {
+    "id": "TC-001",
+    "area": "Access & Data",
+    "requirements": "FR-ACC-01, FR-ACC-02, FR-ACC-04",
+    "title": "Anonymous use and data persistence after reload",
+    "steps": "Pre: fresh browser profile, app never opened.\n1. Open the app URL.\n2. Confirm no login/registration screen is shown.\n3. Create cellar 'Sparkling Fridge' (8 °C) and add bottle 'Franciacorta Brut DOCG 2019'.\n4. Reload the page, then close and reopen the browser.\n5. Check the first-visit notice about clearing browser data.",
+    "expected": "App is fully usable without an account. Cellar and bottle are still present after reload and browser restart with all field values unchanged. A clear warning explains that clearing browser data deletes the cellar and recommends regular backups.",
+    "priority": "High",
+    "automation": [
+      "tests/api.test.ts",
+      "tests/e2e/app.spec.ts"
+    ],
+    "manualStepsRequired": false,
+    "executionStatus": "Not reported by traceability generation; inspect runner output and perform manual steps."
+  },
+  {
+    "id": "TC-002",
+    "area": "Access & Data",
+    "requirements": "FR-ACC-03, FR-SET-04",
+    "title": "Full backup export and restore round-trip (incl. photos)",
+    "steps": "Pre: 2 cellars, 10 bottles (3 with photos), 2 opening events.\n1. Settings > Data > Export full backup; save the file.\n2. Settings > Delete all data (confirm twice).\n3. Settings > Import backup; select the saved file.\n4. Compare cellars, bottles, photos, history and settings with the original.",
+    "expected": "Backup file downloads with a dated filename. After restore, every cellar, bottle, photo, history event and setting matches the original exactly; counts on Dashboard are identical. A success toast confirms the number of items restored.",
+    "priority": "High",
+    "automation": [
+      "tests/domain.test.ts",
+      "tests/api.test.ts",
+      "tests/e2e/app.spec.ts"
+    ],
+    "manualStepsRequired": false,
+    "executionStatus": "Not reported by traceability generation; inspect runner output and perform manual steps."
+  },
+  {
+    "id": "TC-003",
+    "area": "Access & Data",
+    "requirements": "FR-ACC-03, FR-SET-04",
+    "title": "Restore rejects an invalid or corrupted backup file",
+    "steps": "Pre: existing data (5 bottles).\n1. Settings > Import backup.\n2. Select a .txt file renamed to the backup extension.\n3. Repeat with a truncated (corrupted) backup file.\n4. Repeat with a backup from a newer, unsupported version (if available).",
+    "expected": "Each import is refused with a clear, specific error message. No partial import occurs; the existing 5 bottles are untouched. The user can retry or cancel.",
+    "priority": "High",
+    "automation": [
+      "tests/domain.test.ts",
+      "tests/api.test.ts",
+      "tests/e2e/app.spec.ts"
+    ],
+    "manualStepsRequired": false,
+    "executionStatus": "Not reported by traceability generation; inspect runner output and perform manual steps."
+  },
+  {
+    "id": "TC-004",
+    "area": "Navigation & UI",
+    "requirements": "FR-UI-01, FR-A11Y-19",
+    "title": "Main navigation reaches every section",
+    "steps": "1. From the Dashboard, select each item: Dashboard, My Bottles, Cellars, Add Bottle, Food Pairing, Statistics, Settings.\n2. Repeat at 1280 px and at 375 px (collapsed menu).\n3. Use browser Back/Forward between sections.",
+    "expected": "Each item opens the correct page; the current item is indicated (not by colour alone). Navigation order and labels are identical on every page and at both widths. Back/Forward restores the previous section.",
+    "priority": "High",
+    "automation": [
+      "tests/e2e/app.spec.ts"
+    ],
+    "manualStepsRequired": false,
+    "executionStatus": "Not reported by traceability generation; inspect runner output and perform manual steps."
+  },
+  {
+    "id": "TC-005",
+    "area": "Navigation & UI",
+    "requirements": "FR-UI-04",
+    "title": "Global search finds bottles and cellars from any page",
+    "steps": "Pre: bottle 'Franciacorta Brut DOCG 2019' in 'Sparkling Fridge'.\n1. From Statistics, type 'francia' in global search.\n2. Select the bottle result.\n3. Search 'sparkling'.\n4. Search 'zzzz'.",
+    "expected": "Results appear while typing, grouped by type; selecting the bottle opens its detail page. 'sparkling' returns the cellar. 'zzzz' shows a helpful 'No results' message.",
+    "priority": "Medium",
+    "automation": [
+      "tests/e2e/app.spec.ts"
+    ],
+    "manualStepsRequired": false,
+    "executionStatus": "Not reported by traceability generation; inspect runner output and perform manual steps."
+  },
+  {
+    "id": "TC-006",
+    "area": "Navigation & UI",
+    "requirements": "FR-UI-05, FR-UI-06",
+    "title": "Delete bottle: confirmation, toast and 10-second Undo",
+    "steps": "Pre: bottle 'Etna Bianco DOC 2022' exists.\n1. Open the bottle and choose Delete.\n2. Cancel the confirmation dialog.\n3. Delete again and confirm.\n4. Within 10 s select Undo in the toast.\n5. Delete again, confirm and wait more than 10 s.",
+    "expected": "Cancel keeps the bottle. Confirming removes it and shows a toast with Undo; Undo fully restores it (all fields, photos, history). After 10 s the Undo option disappears and the deletion is permanent.",
+    "priority": "High",
+    "automation": [
+      "tests/domain.test.ts",
+      "tests/e2e/app.spec.ts"
+    ],
+    "manualStepsRequired": false,
+    "executionStatus": "Not reported by traceability generation; inspect runner output and perform manual steps."
+  },
+  {
+    "id": "TC-007",
+    "area": "Dashboard",
+    "requirements": "FR-DSH-01",
+    "title": "Dashboard KPIs match the inventory",
+    "steps": "Pre: seed 2 cellars, 12 bottles of 8 distinct wines: 5 Ready, 2 Drink soon, prices set (total €640).\n1. Open the Dashboard.\n2. Compare each KPI with the seeded data.\n3. Add 1 bottle (quantity 2, price €25) and return to the Dashboard.",
+    "expected": "KPIs show Total bottles 12, Distinct wines 8, Cellars 2, Ready to drink 5, Drink soon 2, Estimated value €640. After adding, totals update to 14 bottles, 9 wines and €690 without a manual refresh.",
+    "priority": "High",
+    "automation": [
+      "tests/domain.test.ts"
+    ],
+    "manualStepsRequired": false,
+    "executionStatus": "Not reported by traceability generation; inspect runner output and perform manual steps."
+  },
+  {
+    "id": "TC-008",
+    "area": "Dashboard",
+    "requirements": "FR-DSH-02, FR-DSH-03, FR-DSH-04, FR-DSH-05, FR-DSH-06",
+    "title": "Dashboard widgets and quick actions",
+    "steps": "Pre: seeded data as above.\n1. Check 'Recently added' list.\n2. Check each cellar card (temperature, occupancy).\n3. Check drinking-window highlights.\n4. Use each quick action (e.g. Add bottle, Mark as opened).",
+    "expected": "Recently added shows the latest bottles newest first. Cellar cards show target temperature in the chosen unit and occupancy as count/capacity/%. Drink soon and Past peak bottles are highlighted with text labels. Quick actions open the correct page or dialog.",
+    "priority": "Low",
+    "automation": [
+      "tests/domain.test.ts"
+    ],
+    "manualStepsRequired": false,
+    "executionStatus": "Not reported by traceability generation; inspect runner output and perform manual steps."
+  },
+  {
+    "id": "TC-009",
+    "area": "Cellars",
+    "requirements": "FR-CEL-01, FR-CEL-02, FR-CEL-03, FR-CEL-04",
+    "title": "Create a cellar (happy path)",
+    "steps": "1. Cellars > Add cellar.\n2. Name 'Sparkling Fridge', target temperature 8, capacity 24.\n3. Save.\n4. Switch Settings to °F and reopen the cellar.",
+    "expected": "Cellar is saved with a confirmation toast and listed with 8 °C and occupancy 0/24 (0%). In °F mode it shows 46.4 °F; the stored value is unchanged when switching back to °C.",
+    "priority": "High",
+    "automation": [
+      "tests/domain.test.ts",
+      "tests/e2e/app.spec.ts"
+    ],
+    "manualStepsRequired": false,
+    "executionStatus": "Not reported by traceability generation; inspect runner output and perform manual steps."
+  },
+  {
+    "id": "TC-010",
+    "area": "Cellars",
+    "requirements": "FR-CEL-02",
+    "title": "Cellar name is mandatory and unique",
+    "steps": "Pre: cellar 'Sparkling Fridge' exists.\n1. Add cellar with empty name and save.\n2. Enter name 'Sparkling Fridge' and save.\n3. Enter 'sparkling fridge ' (lower case, trailing space) and save.\n4. Enter 'Red Wine Rack' and save.",
+    "expected": "Steps 1–3 are blocked with inline errors ('Name is required' / 'A cellar with this name already exists'). Step 4 saves successfully.",
+    "priority": "High",
+    "automation": [
+      "tests/domain.test.ts",
+      "tests/e2e/app.spec.ts"
+    ],
+    "manualStepsRequired": false,
+    "executionStatus": "Not reported by traceability generation; inspect runner output and perform manual steps."
+  },
+  {
+    "id": "TC-011",
+    "area": "Cellars",
+    "requirements": "FR-CEL-03",
+    "title": "Target temperature boundary values",
+    "steps": "1. Add/edit a cellar and enter temperature: -0.5, 0, 0.5, 12.3, 25, 25.5, empty, 'abc'.\n2. Try to save after each value.",
+    "expected": "0, 0.5 and 25 are accepted. -0.5, 25.5, 12.3 (not a 0.5 step), empty and 'abc' are rejected with a specific inline message stating the allowed range 0–25 °C in steps of 0.5.",
+    "priority": "High",
+    "automation": [
+      "tests/domain.test.ts",
+      "tests/e2e/app.spec.ts"
+    ],
+    "manualStepsRequired": false,
+    "executionStatus": "Not reported by traceability generation; inspect runner output and perform manual steps."
+  },
+  {
+    "id": "TC-012",
+    "area": "Cellars",
+    "requirements": "FR-CEL-05",
+    "title": "Cellar with bottles cannot be deleted without moving them",
+    "steps": "Pre: 'Sparkling Fridge' holds 3 bottles; 'Red Wine Rack' exists.\n1. Delete 'Sparkling Fridge'.\n2. In the dialog choose to move bottles to 'Red Wine Rack' and confirm.\n3. Check both cellars.",
+    "expected": "Direct deletion is blocked with an explanation. After choosing Move and confirming, the 3 bottles appear in 'Red Wine Rack' (history records the move) and 'Sparkling Fridge' is deleted. No bottle is lost.",
+    "priority": "High",
+    "automation": [
+      "tests/domain.test.ts",
+      "tests/e2e/app.spec.ts"
+    ],
+    "manualStepsRequired": false,
+    "executionStatus": "Not reported by traceability generation; inspect runner output and perform manual steps."
+  },
+  {
+    "id": "TC-013",
+    "area": "Cellars",
+    "requirements": "FR-CEL-06, FR-CEL-07, FR-CEL-08",
+    "title": "Unsuitable temperature and capacity warnings; rack grid",
+    "steps": "Pre: 'Sparkling Fridge' 8 °C, capacity 2, holding 2 bottles.\n1. Add red 'Barolo DOCG Riserva 2016' and pick 'Sparkling Fridge'.\n2. Open the cellar rack grid and its text alternative.",
+    "expected": "A warning states the cellar is full (capacity reached) and that 8 °C is unsuitable for red wine; the user can still choose another cellar or proceed consciously. The rack grid shows occupied positions and an equivalent text/table list is available.",
+    "priority": "Medium",
+    "automation": [
+      "tests/e2e/app.spec.ts"
+    ],
+    "manualStepsRequired": false,
+    "executionStatus": "Not reported by traceability generation; inspect runner output and perform manual steps."
+  },
+  {
+    "id": "TC-014",
+    "area": "Bottles",
+    "requirements": "FR-BOT-01",
+    "title": "Add bottle with all fields (happy path)",
+    "steps": "Pre: cellar 'Sparkling Fridge' (8 °C).\n1. Add Bottle: name 'Franciacorta Brut DOCG 2019', type Franciacorta, vintage 2019, ABV 12.5, size 75 cl, quantity 6, cellar 'Sparkling Fridge', shelf 2 / position B3, origin Gift, price 32.00, drink from 2024 by 2029, rating 4, notes, tags 'celebration'.\n2. Save and open the detail page.",
+    "expected": "Bottle is saved with a confirmation toast; the detail page shows every value exactly as entered (date placed defaults to today 06/11/2026 unless changed). It appears in My Bottles and the cellar occupancy rises by 6.",
+    "priority": "High",
+    "automation": [
+      "tests/domain.test.ts",
+      "tests/e2e/app.spec.ts"
+    ],
+    "manualStepsRequired": false,
+    "executionStatus": "Not reported by traceability generation; inspect runner output and perform manual steps."
+  },
+  {
+    "id": "TC-015",
+    "area": "Bottles",
+    "requirements": "FR-BOT-01, FR-BOT-02",
+    "title": "Mandatory fields and inline validation",
+    "steps": "1. Open Add Bottle and save without entering anything.\n2. Fill fields one by one and observe errors.\n3. Clear the defaulted 'Date placed in cellar' and save.",
+    "expected": "Save is blocked. Inline errors appear for Name, Wine type, Quantity (if cleared), Cellar, Date placed and Origin, each next to its field. Errors clear as each field becomes valid. Optional fields never show 'required' errors.",
+    "priority": "High",
+    "automation": [
+      "tests/domain.test.ts",
+      "tests/e2e/app.spec.ts"
+    ],
+    "manualStepsRequired": false,
+    "executionStatus": "Not reported by traceability generation; inspect runner output and perform manual steps."
+  },
+  {
+    "id": "TC-016",
+    "area": "Bottles",
+    "requirements": "FR-BOT-01",
+    "title": "ABV boundary values",
+    "steps": "1. Add bottle and enter ABV values one at a time: 0, 12.5, 25, 25.1, -1, 12.55, '12,5'.\n2. Try to save after each.",
+    "expected": "0, 12.5 and 25 are accepted. 25.1, -1 and 12.55 (more than one decimal) are rejected with an inline message 'ABV must be between 0 and 25 with one decimal'. '12,5' is accepted as 12.5 in Italian locale or rejected with a clear message in English.",
+    "priority": "High",
+    "automation": [
+      "tests/domain.test.ts",
+      "tests/e2e/app.spec.ts"
+    ],
+    "manualStepsRequired": false,
+    "executionStatus": "Not reported by traceability generation; inspect runner output and perform manual steps."
+  },
+  {
+    "id": "TC-017",
+    "area": "Bottles",
+    "requirements": "FR-BOT-01",
+    "title": "Vintage boundary values (NV, 1799, 1800, current and future year)",
+    "steps": "1. Add bottle and enter vintage: NV, 1800, 1799, 2026, 2027, '19A9', empty.\n2. Try to save after each.",
+    "expected": "NV, 1800 and 2026 (current year) are accepted. 1799, 2027 and '19A9' are rejected with 'Vintage must be NV or a year between 1800 and 2026'. Empty behaves as specified (required or treated as unknown) consistently.",
+    "priority": "High",
+    "automation": [
+      "tests/domain.test.ts",
+      "tests/e2e/app.spec.ts"
+    ],
+    "manualStepsRequired": false,
+    "executionStatus": "Not reported by traceability generation; inspect runner output and perform manual steps."
+  },
+  {
+    "id": "TC-018",
+    "area": "Bottles",
+    "requirements": "FR-BOT-01, FR-BOT-08",
+    "title": "Quantity default and boundary values",
+    "steps": "1. Open Add Bottle and check the default quantity.\n2. Enter quantity: 0, 1, 999, -1, 2.5, empty.\n3. Try to save after each.",
+    "expected": "Quantity defaults to 1. 0, 1 and 999 are accepted (quantity 0 saves the bottle directly to Archive). -1, 2.5 and empty are rejected with a clear inline message.",
+    "priority": "High",
+    "automation": [
+      "tests/domain.test.ts",
+      "tests/e2e/app.spec.ts"
+    ],
+    "manualStepsRequired": false,
+    "executionStatus": "Not reported by traceability generation; inspect runner output and perform manual steps."
+  },
+  {
+    "id": "TC-019",
+    "area": "Bottles",
+    "requirements": "FR-BOT-03, FR-BOT-04, FR-BOT-05",
+    "title": "View, edit and duplicate a bottle",
+    "steps": "Pre: 'Barolo DOCG Riserva 2016' exists.\n1. Open its detail page.\n2. Edit price 45 to 48 and add tag 'gift-idea'; save.\n3. Duplicate the bottle and change vintage to 2017; save.",
+    "expected": "Detail page shows all data. Edit is saved and reflected everywhere (list, statistics value). Duplicate opens a prefilled form; saving creates a separate 2017 bottle while the 2016 original is unchanged.",
+    "priority": "Medium",
+    "automation": [
+      "tests/domain.test.ts",
+      "tests/e2e/app.spec.ts"
+    ],
+    "manualStepsRequired": false,
+    "executionStatus": "Not reported by traceability generation; inspect runner output and perform manual steps."
+  },
+  {
+    "id": "TC-020",
+    "area": "Bottles",
+    "requirements": "FR-BOT-06, FR-HIS-03",
+    "title": "Move bottle to another cellar is recorded in history",
+    "steps": "Pre: bottle in 'Sparkling Fridge'; cellar 'Red Wine Rack' exists.\n1. On the bottle choose Move.\n2. Select 'Red Wine Rack', shelf 1; confirm.\n3. Open the bottle history.",
+    "expected": "Bottle now belongs to 'Red Wine Rack'; both cellars' occupancy updates. History shows a 'Moved from Sparkling Fridge to Red Wine Rack' event with date.",
+    "priority": "Medium",
+    "automation": [
+      "tests/domain.test.ts",
+      "tests/e2e/app.spec.ts"
+    ],
+    "manualStepsRequired": false,
+    "executionStatus": "Not reported by traceability generation; inspect runner output and perform manual steps."
+  },
+  {
+    "id": "TC-021",
+    "area": "Bottles",
+    "requirements": "FR-BOT-07, FR-BOT-08",
+    "title": "Quantity +/- buttons and automatic Archive at 0",
+    "steps": "Pre: 'Etna Bianco DOC 2022' quantity 2.\n1. Press + once, then - three times.\n2. Open Archive.\n3. Press + on the archived bottle (or Restore).",
+    "expected": "Quantity goes 3, 2, 1, 0; the - button is disabled at 0 (never negative). At 0 the bottle leaves the active list and appears in Archive with a toast. Increasing it restores it to the active inventory.",
+    "priority": "High",
+    "automation": [
+      "tests/domain.test.ts",
+      "tests/e2e/app.spec.ts"
+    ],
+    "manualStepsRequired": false,
+    "executionStatus": "Not reported by traceability generation; inspect runner output and perform manual steps."
+  },
+  {
+    "id": "TC-022",
+    "area": "Bottles",
+    "requirements": "FR-BOT-09",
+    "title": "Drinking status is computed automatically",
+    "steps": "Pre: today 06/11/2026. Create 4 bottles with drinking windows: from 2028 by 2035; from 2022 by 2031; from 2020 by 2027; from 2015 by 2025.\n1. Check the status badge on each.\n2. Edit the first bottle to from 2024 and re-check.",
+    "expected": "Statuses are Too young, Ready, Drink soon and Past peak respectively, each shown as text (not colour only). After editing, the first bottle changes to Ready immediately.",
+    "priority": "High",
+    "automation": [
+      "tests/domain.test.ts"
+    ],
+    "manualStepsRequired": false,
+    "executionStatus": "Not reported by traceability generation; inspect runner output and perform manual steps."
+  },
+  {
+    "id": "TC-023",
+    "area": "Photos",
+    "requirements": "FR-PHO-01, FR-PHO-02, FR-PHO-03, FR-PHO-04",
+    "title": "Upload, crop/rotate and extra photos",
+    "steps": "1. On a bottle, upload a 4 MB JPEG label photo.\n2. Rotate 90° and crop; save.\n3. Add 3 extra photos (PNG, WebP, HEIC).\n4. Try to add a 4th extra photo.\n5. On a phone, use the camera option.",
+    "expected": "Photo is saved resized (reduced file size), with crop/rotation applied. Three extra photos are accepted; the 4th is refused with a message 'Maximum 3 extra photos'. Camera capture works on mobile.",
+    "priority": "Medium",
+    "automation": [
+      "tests/domain.test.ts",
+      "tests/e2e/app.spec.ts"
+    ],
+    "manualStepsRequired": true,
+    "executionStatus": "Not reported by traceability generation; inspect runner output and perform manual steps."
+  },
+  {
+    "id": "TC-024",
+    "area": "Photos",
+    "requirements": "FR-PHO-02",
+    "title": "Invalid photo files are rejected",
+    "steps": "1. Upload a 12 MB JPEG.\n2. Upload a GIF and a PDF.\n3. Upload a 10 MB PNG (exact limit).",
+    "expected": "12 MB file, GIF and PDF are rejected with specific messages (size limit 10 MB; allowed formats JPEG, PNG, HEIC, WebP). The 10 MB PNG is accepted. The bottle data is not lost after an error.",
+    "priority": "High",
+    "automation": [
+      "tests/e2e/app.spec.ts"
+    ],
+    "manualStepsRequired": false,
+    "executionStatus": "Not reported by traceability generation; inspect runner output and perform manual steps."
+  },
+  {
+    "id": "TC-025",
+    "area": "Photos",
+    "requirements": "FR-PHO-05, FR-PHO-06, FR-A11Y-01",
+    "title": "Placeholder illustration and alt text",
+    "steps": "1. Add a rosé bottle without a photo.\n2. Add 'Franciacorta Brut DOCG 2019' with a photo; open the alt text field.\n3. Edit the alt text and save.",
+    "expected": "Bottle without a photo shows the rosé placeholder (decorative, hidden from screen readers). Alt text is prefilled e.g. 'Franciacorta Brut DOCG 2019, Franciacorta, 2019', is editable and the edited text is used on all images of that bottle.",
+    "priority": "Medium",
+    "automation": [
+      "tests/domain.test.ts",
+      "tests/e2e/app.spec.ts"
+    ],
+    "manualStepsRequired": false,
+    "executionStatus": "Not reported by traceability generation; inspect runner output and perform manual steps."
+  },
+  {
+    "id": "TC-026",
+    "area": "Origin",
+    "requirements": "FR-ORI-01, FR-ORI-02, FR-ORI-03, FR-ORI-04",
+    "title": "Origin values and contextual fields",
+    "steps": "1. In Add Bottle open Origin and list the values.\n2. Select Gift; then Wine shop; then Grocery; then Trip; then Winery visit; then Online purchase.\n3. Enter 'Gifted by: Marco', 'Occasion: Birthday', switch to Wine shop and back to Gift.\n4. In Settings add origin 'Wine club' and check it in the form.",
+    "expected": "Options: Gift, Wine shop, Grocery, Trip, Winery visit, Online purchase, Auction, Other (+ custom). Gift shows Gifted by + Occasion; Wine shop/Grocery show Shop name; Trip/Winery visit show Place/trip; others show none. Entered values are not silently lost on switching back. 'Wine club' appears in the list.",
+    "priority": "Medium",
+    "automation": [
+      "tests/domain.test.ts",
+      "tests/e2e/app.spec.ts"
+    ],
+    "manualStepsRequired": false,
+    "executionStatus": "Not reported by traceability generation; inspect runner output and perform manual steps."
+  },
+  {
+    "id": "TC-027",
+    "area": "Inventory",
+    "requirements": "FR-INV-01, FR-INV-02, FR-INV-03",
+    "title": "Grid/list toggle and free-text search across fields",
+    "steps": "Pre: 20 bottles incl. one with producer 'Cantina Esempio', region Piedmont, grape Nebbiolo, tag 'anniversary', notes 'cherry'.\n1. Toggle grid and list view.\n2. Search for each of: 'Esempio', 'Piedmont', 'nebbiolo', 'anniversary', 'cherry'.",
+    "expected": "Both views show the same bottles and the chosen view persists after reload. Each search term returns the matching bottle (case-insensitive) and a result count.",
+    "priority": "High",
+    "automation": [
+      "tests/domain.test.ts",
+      "tests/e2e/app.spec.ts"
+    ],
+    "manualStepsRequired": false,
+    "executionStatus": "Not reported by traceability generation; inspect runner output and perform manual steps."
+  },
+  {
+    "id": "TC-028",
+    "area": "Inventory",
+    "requirements": "FR-INV-04, FR-INV-05",
+    "title": "Filters as removable chips and sorting",
+    "steps": "1. Filter: type Red, cellar 'Red Wine Rack', vintage 2015–2019, ABV 13–15, drinking status Ready, rating ≥4, price ≤50.\n2. Remove the ABV chip, then 'Clear all'.\n3. Sort by vintage, name, price ascending/descending.",
+    "expected": "Only bottles matching all filters are listed; each filter appears as a chip with an accessible remove button. Removing a chip widens results instantly; 'Clear all' restores the full list. Sorting orders the results correctly in both directions.",
+    "priority": "Medium",
+    "automation": [
+      "tests/domain.test.ts",
+      "tests/e2e/app.spec.ts"
+    ],
+    "manualStepsRequired": false,
+    "executionStatus": "Not reported by traceability generation; inspect runner output and perform manual steps."
+  },
+  {
+    "id": "TC-029",
+    "area": "Inventory",
+    "requirements": "FR-INV-06",
+    "title": "Bulk actions: move, tag, delete, export",
+    "steps": "1. Select 5 bottles.\n2. Bulk move to 'Red Wine Rack'.\n3. Bulk add tag 'party'.\n4. Bulk export to CSV.\n5. Bulk delete (confirm) and Undo.",
+    "expected": "Each action applies to exactly the 5 selected bottles with a summary toast. CSV contains 5 rows. Bulk delete asks for confirmation and Undo restores all 5.",
+    "priority": "Medium",
+    "automation": [
+      "tests/domain.test.ts",
+      "tests/e2e/app.spec.ts"
+    ],
+    "manualStepsRequired": false,
+    "executionStatus": "Not reported by traceability generation; inspect runner output and perform manual steps."
+  },
+  {
+    "id": "TC-030",
+    "area": "Food Pairing",
+    "requirements": "FR-FOD-01, FR-FOD-04",
+    "title": "Pairings and serving advice for a bottle",
+    "steps": "1. Open 'Franciacorta Brut DOCG 2019' > Food pairing.\n2. Open 'Barolo DOCG Riserva 2016' > Food pairing.",
+    "expected": "Each bottle shows at least 3 dish suggestions, each with a short explanation. Serving advice shows temperature (e.g. 6–8 °C for Franciacorta), glass type and decanting advice (e.g. decant Barolo).",
+    "priority": "Medium",
+    "automation": [
+      "tests/domain.test.ts",
+      "tests/e2e/app.spec.ts"
+    ],
+    "manualStepsRequired": false,
+    "executionStatus": "Not reported by traceability generation; inspect runner output and perform manual steps."
+  },
+  {
+    "id": "TC-031",
+    "area": "Food Pairing",
+    "requirements": "FR-FOD-02, FR-FOD-03, FR-FOD-05, FR-FOD-07",
+    "title": "Reverse search by dish, personal pairings, offline rules",
+    "steps": "1. Food Pairing > search dish 'mushroom risotto'.\n2. Mark one suggestion as liked and another as disliked; add personal pairing 'Barolo + truffle tagliatelle'.\n3. Go offline and repeat step 1.",
+    "expected": "Results only include bottles from the user's own cellars, with Ready / Drink soon bottles listed first. Like/dislike and personal pairing are saved and shown next time. Offline, base pairing rules still return results.",
+    "priority": "Low",
+    "automation": [
+      "tests/domain.test.ts",
+      "tests/e2e/app.spec.ts"
+    ],
+    "manualStepsRequired": false,
+    "executionStatus": "Not reported by traceability generation; inspect runner output and perform manual steps."
+  },
+  {
+    "id": "TC-032",
+    "area": "History",
+    "requirements": "FR-HIS-01, FR-HIS-02, FR-HIS-04",
+    "title": "Mark bottle as opened with tasting notes",
+    "steps": "Pre: 'Franciacorta Brut DOCG 2019' quantity 6.\n1. Mark as opened: date 06/11/2026, occasion 'Anniversary', people 4, quantity 2.\n2. Add rating 5 and tasting notes.\n3. Open the tasting journal.",
+    "expected": "Stock decreases to 4 and the Dashboard updates. The event shows date, occasion, people and quantity; the rating and notes appear in the tasting journal entry for that bottle.",
+    "priority": "High",
+    "automation": [
+      "tests/domain.test.ts",
+      "tests/e2e/app.spec.ts"
+    ],
+    "manualStepsRequired": false,
+    "executionStatus": "Not reported by traceability generation; inspect runner output and perform manual steps."
+  },
+  {
+    "id": "TC-033",
+    "area": "History",
+    "requirements": "FR-HIS-01, FR-HIS-03, FR-HIS-05",
+    "title": "Opening more than stock is blocked; undo last opening",
+    "steps": "Pre: bottle quantity 3.\n1. Mark as opened with quantity 5.\n2. Mark as opened with quantity 1.\n3. Undo the last opening.\n4. Open the event history.",
+    "expected": "Quantity 5 is rejected ('Only 3 bottles in stock'). After opening 1, stock is 2; Undo restores stock to 3 and removes or marks the event as undone. History lists all events in date order.",
+    "priority": "Medium",
+    "automation": [
+      "tests/domain.test.ts",
+      "tests/e2e/app.spec.ts"
+    ],
+    "manualStepsRequired": false,
+    "executionStatus": "Not reported by traceability generation; inspect runner output and perform manual steps."
+  },
+  {
+    "id": "TC-034",
+    "area": "Notifications",
+    "requirements": "FR-NOT-01, FR-NOT-02, FR-NOT-03, FR-A11Y-03",
+    "title": "Drinking-window, cellar full and low-stock alerts",
+    "steps": "Pre: a bottle with drink by 2026; a cellar at 100% capacity; a bottle reaching the low-stock threshold.\n1. Open the app and the notifications area.\n2. Dismiss one alert and reload.",
+    "expected": "Three alerts are listed, each with text and icon (not colour or sound only). The dismissed alert does not reappear after reload; the others remain.",
+    "priority": "Medium",
+    "automation": [
+      "tests/domain.test.ts"
+    ],
+    "manualStepsRequired": false,
+    "executionStatus": "Not reported by traceability generation; inspect runner output and perform manual steps."
+  },
+  {
+    "id": "TC-035",
+    "area": "Statistics",
+    "requirements": "FR-STA-01, FR-STA-02, FR-STA-03, FR-STA-04, FR-A11Y-05",
+    "title": "Charts with totals, data tables and text summaries",
+    "steps": "Pre: seeded data (12 bottles, 2 cellars, 4 origins, 3 types).\n1. Open Statistics.\n2. Compare counts by type, cellar, origin, region and vintage with the data.\n3. Check total value and consumption over time.\n4. For each chart open its data table and summary.",
+    "expected": "All counts and the total value match the inventory; consumption reflects opening events. Every chart has an equivalent data table and a text summary that state the same figures.",
+    "priority": "Medium",
+    "automation": [
+      "tests/api.test.ts"
+    ],
+    "manualStepsRequired": false,
+    "executionStatus": "Not reported by traceability generation; inspect runner output and perform manual steps."
+  },
+  {
+    "id": "TC-036",
+    "area": "Statistics",
+    "requirements": "FR-STA-05, FR-SET-05",
+    "title": "Export inventory as CSV and PDF",
+    "steps": "Pre: 12 bottles, some with accented names (e.g. 'Rosé di Montagna 2023').\n1. Statistics > Export CSV.\n2. Export PDF.\n3. Open both files.",
+    "expected": "CSV opens in a spreadsheet with correct headers, 12 rows and accents intact (UTF-8). PDF is readable, lists all bottles and totals, and has a meaningful title.",
+    "priority": "Medium",
+    "automation": [
+      "tests/domain.test.ts",
+      "tests/api.test.ts"
+    ],
+    "manualStepsRequired": false,
+    "executionStatus": "Not reported by traceability generation; inspect runner output and perform manual steps."
+  },
+  {
+    "id": "TC-037",
+    "area": "Settings & Data",
+    "requirements": "FR-SET-01, FR-SET-02, FR-SET-03, FR-A11Y-17",
+    "title": "Preferences: units, currency, language, date format, default cellar",
+    "steps": "1. Set °F, currency GBP, language Italian, date format dd/mm/yyyy, default cellar 'Red Wine Rack'.\n2. Browse Dashboard, a bottle detail and Add Bottle.\n3. Reload.\n4. Set text size large, reduced motion on, notification duration 20 s.",
+    "expected": "Temperatures show in °F, prices in £, UI text in Italian, dates as 06/11/2026, Add Bottle preselects 'Red Wine Rack'. All settings persist after reload. Accessibility preferences are applied immediately.",
+    "priority": "Medium",
+    "automation": [
+      "tests/domain.test.ts",
+      "tests/e2e/app.spec.ts"
+    ],
+    "manualStepsRequired": false,
+    "executionStatus": "Not reported by traceability generation; inspect runner output and perform manual steps."
+  },
+  {
+    "id": "TC-038",
+    "area": "Settings & Data",
+    "requirements": "FR-SET-05",
+    "title": "CSV import with column mapping and validation report",
+    "steps": "Pre: CSV with 10 rows: 7 valid, 1 ABV 30, 1 vintage 1799, 1 missing name; columns named differently (e.g. 'Wine', 'Alc').\n1. Settings > Import CSV.\n2. Map columns ('Wine' to Name, 'Alc' to ABV).\n3. Run import.",
+    "expected": "Mapping screen lets every column be mapped or skipped. Validation report lists rows 8–10 with specific reasons; the user can import the 7 valid rows only. Exactly 7 bottles are added; no invalid row is imported.",
+    "priority": "High",
+    "automation": [
+      "tests/domain.test.ts",
+      "tests/e2e/app.spec.ts"
+    ],
+    "manualStepsRequired": false,
+    "executionStatus": "Not reported by traceability generation; inspect runner output and perform manual steps."
+  },
+  {
+    "id": "TC-039",
+    "area": "Settings & Data",
+    "requirements": "FR-SET-06, FR-UI-06",
+    "title": "Delete all data requires double confirmation",
+    "steps": "Pre: 10 bottles, 2 cellars.\n1. Settings > Delete all data; confirm first step, cancel second.\n2. Repeat and confirm both steps.\n3. Reload.",
+    "expected": "After cancelling, all data remains. After double confirmation, all cellars, bottles, photos and history are removed and the app shows the empty state; data does not return after reload. The dialog recommends exporting a backup first.",
+    "priority": "High",
+    "automation": [
+      "tests/api.test.ts",
+      "tests/e2e/app.spec.ts"
+    ],
+    "manualStepsRequired": false,
+    "executionStatus": "Not reported by traceability generation; inspect runner output and perform manual steps."
+  },
+  {
+    "id": "TC-040",
+    "area": "Accessibility",
+    "requirements": "FR-A11Y-07, FR-A11Y-08, FR-A11Y-09, FR-A11Y-11",
+    "title": "Keyboard-only operation of the main journey",
+    "steps": "Pre: no mouse/touch.\n1. Tab from page load; use the skip link.\n2. Add a bottle (incl. type combobox, date, star rating, photo upload), save.\n3. Move it to another cellar without drag-and-drop; open filters; mark as opened.",
+    "expected": "Every function is reachable and operable with keyboard only; no keyboard trap. Skip link moves focus to main content. Focus order is logical and focus is always visible and not hidden by sticky headers or toasts. Drag-and-drop has a keyboard alternative.",
+    "priority": "High",
+    "automation": [
+      "tests/e2e/app.spec.ts"
+    ],
+    "manualStepsRequired": true,
+    "executionStatus": "Not reported by traceability generation; inspect runner output and perform manual steps."
+  },
+  {
+    "id": "TC-041",
+    "area": "Accessibility",
+    "requirements": "FR-A11Y-15, FR-A11Y-16, FR-A11Y-24",
+    "title": "Screen reader (NVDA + Firefox/Chrome): forms, errors, announcements",
+    "steps": "1. With NVDA, open Add Bottle and tab through all fields.\n2. Submit with errors.\n3. Save a valid bottle; delete it and Undo.",
+    "expected": "Every field announces its label, role, value and required state (text, not asterisk only). Errors are announced, each describes how to fix it, and an error summary with links to fields is provided. Save/delete/Undo toasts are announced via live regions without moving focus.",
+    "priority": "High",
+    "automation": [
+      "tests/e2e/app.spec.ts"
+    ],
+    "manualStepsRequired": true,
+    "executionStatus": "Not reported by traceability generation; inspect runner output and perform manual steps."
+  },
+  {
+    "id": "TC-042",
+    "area": "Accessibility",
+    "requirements": "FR-A11Y-01, FR-A11Y-21, FR-A11Y-22",
+    "title": "Screen reader (VoiceOver iOS/macOS Safari): structure and custom widgets",
+    "steps": "1. With VoiceOver, navigate Dashboard by headings and landmarks.\n2. Operate the star rating, ABV slider, tabs on the detail page and the cellar rack grid.\n3. Check images.",
+    "expected": "Headings are hierarchical; banner, navigation, main and contentinfo landmarks exist. Custom widgets expose correct roles, names, states and values and are operable by VoiceOver gestures. Informative images have alt text; decorative ones are ignored.",
+    "priority": "High",
+    "automation": [
+      "tests/e2e/app.spec.ts"
+    ],
+    "manualStepsRequired": true,
+    "executionStatus": "Not reported by traceability generation; inspect runner output and perform manual steps."
+  },
+  {
+    "id": "TC-043",
+    "area": "Accessibility",
+    "requirements": "FR-A11Y-04, FR-UI-02",
+    "title": "Reflow at 400% zoom / 320 px and 200% text resize",
+    "steps": "1. Set browser width 1280 px and zoom 400% (or viewport 320 px).\n2. Visit Dashboard, My Bottles, Add Bottle, Statistics.\n3. Reset zoom and set text size 200%.",
+    "expected": "Content reflows to a single column with no horizontal scrolling (except data tables/rack grid). No text is clipped or overlapping; all functions remain available.",
+    "priority": "High",
+    "automation": [
+      "tests/e2e/app.spec.ts"
+    ],
+    "manualStepsRequired": true,
+    "executionStatus": "Not reported by traceability generation; inspect runner output and perform manual steps."
+  },
+  {
+    "id": "TC-044",
+    "area": "Accessibility",
+    "requirements": "FR-A11Y-02, FR-A11Y-03",
+    "title": "Colour contrast and colour not the only indicator",
+    "steps": "1. With a contrast checker, measure text, icons, input borders and focus indicator in light and dark themes.\n2. Check drinking-status badges, chart series, required fields and errors with greyscale view.",
+    "expected": "Body text ≥4.5:1, large text ≥3:1, UI components and focus indicator ≥3:1 in all themes. Status, errors and chart series are distinguishable without colour (text, icons, patterns).",
+    "priority": "High",
+    "automation": [
+      "tests/e2e/app.spec.ts"
+    ],
+    "manualStepsRequired": true,
+    "executionStatus": "Not reported by traceability generation; inspect runner output and perform manual steps."
+  },
+  {
+    "id": "TC-045",
+    "area": "Accessibility",
+    "requirements": "FR-A11Y-23",
+    "title": "Dialog focus management (open, Esc, focus return)",
+    "steps": "1. With keyboard, open the delete confirmation, Move bottle and photo crop dialogs.\n2. Tab through each; press Esc.\n3. Reopen and use Cancel.",
+    "expected": "Focus moves into the dialog on open and stays inside it while open. Dialog has an accessible name. Esc and Cancel close it and focus returns to the control that opened it.",
+    "priority": "High",
+    "automation": [
+      "tests/e2e/app.spec.ts"
+    ],
+    "manualStepsRequired": false,
+    "executionStatus": "Not reported by traceability generation; inspect runner output and perform manual steps."
+  },
+  {
+    "id": "TC-046",
+    "area": "Accessibility",
+    "requirements": "FR-A11Y-06, FR-A11Y-12, FR-UI-07",
+    "title": "Reduced motion, high contrast and forced colours",
+    "steps": "1. Enable OS 'reduce motion' and reload; trigger toasts and page transitions.\n2. Enable OS dark mode, then Windows High Contrast / forced colours.\n3. Select the app's high-contrast theme.",
+    "expected": "With reduced motion, animations are removed or minimal; nothing flashes more than 3 times per second. The app follows OS dark mode; in forced colours all text, borders, icons and focus remain visible. The high-contrast theme is applied and persists.",
+    "priority": "Medium",
+    "automation": [
+      "tests/e2e/app.spec.ts"
+    ],
+    "manualStepsRequired": true,
+    "executionStatus": "Not reported by traceability generation; inspect runner output and perform manual steps."
+  },
+  {
+    "id": "TC-047",
+    "area": "Accessibility",
+    "requirements": "FR-A11Y-14, FR-A11Y-18, FR-A11Y-20, FR-A11Y-25",
+    "title": "Page titles, language attribute, tooltips and accessibility statement",
+    "steps": "1. Visit each page and read the browser tab title.\n2. Inspect <html lang> in English and Italian.\n3. Hover/focus jargon (e.g. 'NV', 'ABV', 'Drinking window').\n4. Open the accessibility statement.",
+    "expected": "Every page has a unique, descriptive title. lang is 'en' or 'it' matching the UI language. Jargon tooltips appear on hover and keyboard focus and can be dismissed. Accessibility statement is reachable from every page and states conformance and contact details.",
+    "priority": "Medium",
+    "automation": [
+      "tests/e2e/app.spec.ts"
+    ],
+    "manualStepsRequired": false,
+    "executionStatus": "Not reported by traceability generation; inspect runner output and perform manual steps."
+  },
+  {
+    "id": "TC-048",
+    "area": "Accessibility",
+    "requirements": "FR-A11Y-10, FR-A11Y-11",
+    "title": "Target size and pointer alternatives",
+    "steps": "1. On a 375 px touch device, measure the +/- quantity buttons, chip remove buttons, star rating and icon buttons.\n2. Reorder/move a bottle in the rack grid without dragging.",
+    "expected": "All targets are at least 24 × 24 CSS px (or adequately spaced). Every drag action has a single-pointer alternative (e.g. Move button/menu).",
+    "priority": "Medium",
+    "automation": [
+      "tests/e2e/app.spec.ts"
+    ],
+    "manualStepsRequired": true,
+    "executionStatus": "Not reported by traceability generation; inspect runner output and perform manual steps."
+  },
+  {
+    "id": "TC-049",
+    "area": "Non-functional",
+    "requirements": "NFR (performance), FR-INV-08",
+    "title": "Performance with 1,000 bottles and pagination",
+    "steps": "Pre: import 1,000 bottles via CSV.\n1. Load My Bottles (cold and warm load) on a mid-range laptop.\n2. Search 'barolo' and time the response.\n3. Scroll past item 50.",
+    "expected": "Page loads in under 2 s; search results appear in under 500 ms. Items load in pages / incrementally beyond 50 without freezing; position is kept when returning from a detail page.",
+    "priority": "High",
+    "automation": [
+      "tests/domain.test.ts",
+      "tests/e2e/app.spec.ts"
+    ],
+    "manualStepsRequired": false,
+    "executionStatus": "Not reported by traceability generation; inspect runner output and perform manual steps."
+  },
+  {
+    "id": "TC-050",
+    "area": "Non-functional",
+    "requirements": "NFR (offline/PWA)",
+    "title": "Offline use as an installed PWA",
+    "steps": "1. Install the app as a PWA.\n2. Switch the device to airplane mode.\n3. Open the app, add a bottle, edit a cellar, view pairings.\n4. Go back online.",
+    "expected": "App opens offline and all local functions work; changes are saved and still present once back online. An unobtrusive indicator shows offline status.",
+    "priority": "Medium",
+    "automation": [
+      "tests/e2e/app.spec.ts"
+    ],
+    "manualStepsRequired": true,
+    "executionStatus": "Not reported by traceability generation; inspect runner output and perform manual steps."
+  },
+  {
+    "id": "TC-051",
+    "area": "Non-functional",
+    "requirements": "NFR (privacy, compatibility)",
+    "title": "No tracking cookies and cross-browser support",
+    "steps": "1. Open DevTools > Application/Storage and Network in Edge, Chrome, Firefox and Safari (latest).\n2. Run the main journey (add, edit, open, export) in each browser.",
+    "expected": "No third-party or tracking cookies/requests are present. The main journey works identically in all four browsers without layout or functional defects.",
+    "priority": "Medium",
+    "automation": [
+      "tests/api.test.ts",
+      "tests/e2e/app.spec.ts"
+    ],
+    "manualStepsRequired": true,
+    "executionStatus": "Not reported by traceability generation; inspect runner output and perform manual steps."
+  },
+  {
+    "id": "TC-052",
+    "area": "Non-functional",
+    "requirements": "NFR (reliability), FR-UI-05",
+    "title": "No data loss on save error, with retry",
+    "steps": "1. Fill the Add Bottle form completely.\n2. Simulate a storage failure (e.g. DevTools: storage quota exceeded) and save.\n3. Restore storage and select Retry.",
+    "expected": "An understandable error message is shown and announced; the form keeps all entered values. Retry saves the bottle once (no duplicates).",
+    "priority": "High",
+    "automation": [
+      "tests/domain.test.ts",
+      "tests/api.test.ts",
+      "tests/e2e/app.spec.ts"
+    ],
+    "manualStepsRequired": false,
+    "executionStatus": "Not reported by traceability generation; inspect runner output and perform manual steps."
+  }
+]

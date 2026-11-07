@@ -1,0 +1,215 @@
+import { readFile } from 'node:fs/promises';
+import path from 'node:path';
+import {
+  cellarSchema,
+  emptyCollection,
+  newBottle,
+  type Collection,
+} from '../shared/model';
+
+export async function demoCollection(): Promise<Collection> {
+  const s = emptyCollection();
+  s.cellars = [
+    {
+      id: 'main',
+      name: 'Main Cellar',
+      temperature: 12,
+      capacity: 120,
+      location: 'Basement',
+      description: 'Stone basement cellar',
+      kind: 'Room',
+      humidity: 70,
+      shelves: 6,
+      positions: 20,
+    },
+    {
+      id: 'sparkling',
+      name: 'Sparkling Fridge',
+      temperature: 8,
+      capacity: 48,
+      location: 'Kitchen',
+      kind: 'Wine fridge',
+      shelves: 4,
+      positions: 12,
+    },
+    {
+      id: 'reds',
+      name: 'Red Wine Cabinet',
+      temperature: 16,
+      capacity: 36,
+      location: 'Dining room',
+      kind: 'Cabinet',
+      shelves: 6,
+      positions: 6,
+    },
+  ].map((c) => cellarSchema.parse(c));
+  const wines = [
+    [
+      'Barolo DOCG Riserva',
+      'Red',
+      '2016',
+      24,
+      'reds',
+      48,
+      2024,
+      2032,
+      'barolo',
+      'Piedmont',
+      'Nebbiolo',
+    ],
+    [
+      'Franciacorta Brut DOCG',
+      'Franciacorta',
+      '2019',
+      18,
+      'sparkling',
+      38,
+      2024,
+      2030,
+      'franciacorta',
+      'Lombardy',
+      'Chardonnay; Pinot Noir',
+    ],
+    [
+      'Champagne Brut',
+      'Champagne',
+      'NV',
+      18,
+      'sparkling',
+      55,
+      2024,
+      2027,
+      'champagne',
+      'Champagne',
+      'Chardonnay; Pinot Noir',
+    ],
+    [
+      'Sancerre',
+      'White',
+      '2022',
+      20,
+      'main',
+      26,
+      2023,
+      2027,
+      'white',
+      'Loire',
+      'Sauvignon Blanc',
+    ],
+    [
+      'Etna Bianco DOC',
+      'White',
+      '2022',
+      18,
+      'main',
+      25,
+      2024,
+      2029,
+      'white',
+      'Sicily',
+      'Carricante',
+    ],
+    [
+      'Rosé di Montagna',
+      'Rosé',
+      '2023',
+      12,
+      'main',
+      18,
+      2024,
+      2026,
+      'white',
+      'Trentino',
+      'Pinot Noir',
+    ],
+    [
+      'Brunello di Montalcino',
+      'Red',
+      '2021',
+      16,
+      'main',
+      65,
+      2028,
+      2035,
+      'barolo',
+      'Tuscany',
+      'Sangiovese',
+    ],
+    [
+      'Porto Vintage',
+      'Fortified',
+      '2010',
+      2,
+      'main',
+      70,
+      2018,
+      2025,
+      'barolo',
+      'Douro',
+      'Touriga Nacional',
+    ],
+  ] as const;
+  s.bottles = await Promise.all(
+    wines.map(
+      async (
+        [
+          name,
+          type,
+          vintage,
+          quantity,
+          cellarId,
+          price,
+          drinkFrom,
+          drinkBy,
+          image,
+          region,
+          grapes,
+        ],
+        index,
+      ) => {
+        const b = newBottle(`demo-${index}`, cellarId);
+        return {
+          ...b,
+          name,
+          type,
+          vintage,
+          quantity,
+          price,
+          drinkFrom,
+          drinkBy,
+          region,
+          country: ['Sancerre', 'Champagne Brut'].includes(name)
+            ? 'France'
+            : name === 'Porto Vintage'
+              ? 'Portugal'
+              : 'Italy',
+          grapes: grapes.split('; '),
+          abv: type === 'Red' ? 14.5 : type === 'Fortified' ? 20 : 12.5,
+          origin: index === 1 ? 'Gift' : 'Winery visit',
+          giftedBy: index === 1 ? 'Marco' : '',
+          producer: index === 1 ? "Ca' del Bosco" : '',
+          datePlaced: `2026-10-${String(28 - index).padStart(2, '0')}`,
+          position: `${Math.floor(index / 2) + 1}/1`,
+          rating: 4,
+          notes: index === 1 ? 'Fine bubbles, citrus, brioche.' : '',
+          photos: [
+            {
+              src: `data:image/webp;base64,${(await readFile(path.resolve('public', 'assets', `${image}.webp`))).toString('base64')}`,
+              alt: `${name}, ${type}, ${vintage}`,
+            },
+          ],
+          history: [
+            {
+              id: `seed-${index}`,
+              kind: 'added' as const,
+              date: '2026-10-28T12:00:00Z',
+              description: 'Added to demo collection',
+            },
+          ],
+        };
+      },
+    ),
+  );
+  s.settings.defaultCellar = 'main';
+  return s;
+}
